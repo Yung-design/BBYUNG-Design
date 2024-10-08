@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dice Roller with GIF</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden; /* Hide scrollbars */
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      color: #EDF7F6;
+      flex-direction: column;
+      height: 100vh; /* Full height of the viewport */
+    }
+    h3{
+        color: #61e368;
+    }
+    .confirmedRollsContainer{
+        max-width: 400px;
+    }
+    .confirmed-roll-symbol {
+  font-size: 150px; /* Adjust the size of the confirmed roll symbols */
+  font-weight: bold;
+  color: #61e368;
+  transform: translateX(35px);  
+  border: 0px solid #61e368; /* Border around each confirmed roll */
+  margin: 5px 0; /* Add some spacing between rolls */
+  border-radius: 5px;
+  padding: 5px}
+    img {
+      position: absolute;
+      top: -5px;
+      left: 50%; /* Align to the center */
+      transform: translateX(-50%); /* Center the GIF */
+      width: 100%;
+      max-width: 300px; /* Adjust the max width as needed */
+      z-index: 1; /* Ensure the GIF is on top */
+    }
+    canvas {
+      z-index: 0; /* Ensure the canvas is below the GIF */
+    }
+    .roll-button {
+      position: absolute;
+      left: 7%; /* Position from the left */
+      top: 60%; /* Center vertically */
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-weight: 700;
+      color: #EDF7F6;
+      background-color: black;
+      border: 1px #EDF7F6;
+      transform: translateY(-50%); /* Center the button */
+      padding: 15px 25px; /* Add padding to the button */
+      font-size: 25px; /* Font size for the button */
+      padding: 10px;
+      cursor: pointer; /* Change cursor to pointer */
+    }
+    .reset-button {
+      position: absolute;
+      left: 7%; /* Position from the left */
+      top: 70%; /* Place below the roll button */
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-weight: 700;
+      color: #EDF7F6;
+      background-color: black;
+      border: 1px #EDF7F6;
+      transform: translateY(-50%); /* Center the button */
+      padding: 5px 25px; /* Add padding to the button */
+      font-size: 25px; /* Font size for the button */
+      padding: 10px;
+      cursor: pointer; /* Change cursor to pointer */
+    }
+    .spreadsheet {
+  position: absolute;
+  left: 6%;
+  top: 5%; /* Move it higher to allow more space */
+  width: 25%; /* Adjust the width of the spreadsheet */
+  max-height: 90vh; /* Increase the height limit to 90% of the viewport */
+  overflow-y: auto; /* Add scrolling if content exceeds height */
+  background-color: rgba(255, 255, 255,); /* Semi-transparent background */
+  border: 0px solid ; /* Border for the table */
+  border-radius: 10px; /* Rounded corners */
+  padding: 10px; /* Padding for the table */
+    }
+    .spreadsheet button:hover {
+    background-color: #FFD580; /* Hover effect for Confirm button */
+    }
+     /* Styling for the rolled dice cells in the spreadsheet */
+  .rolled-dice-cell {
+    font-size: 70px; /* Adjust the size of the rolled dice */
+    font-weight: 700;
+    padding: 8px;
+    border: 0px solid #ffffff;
+    text-align: center;
+  }
+  .confirmedRollsContainer {
+  max-width: 900px; /* Increased width for the container */
+  max-height: 900px;
+  }
+  /* Styling for the Confirm button (remains the same) */
+  .spreadsheet button {
+    background-color: #FFD580;
+    border: 0px solid #FF5733;
+    color: black;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 10px 15px;
+    border-radius: 150px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  .rolled-dice-cell {
+  font-size: 100px; /* You can adjust this number */
+  font-weight: bold;
+  }
+  .spreadsheet button:hover {
+    background-color: #FFC300; /* Hover effect */
+  }
+
+  /* Keep the Confirmed Rolls section unchanged */
+  .confirmed-rolls {
+    font-size: 70px; /* Unchanged size for confirmed rolls */
+  }
+    .spreadsheet button {
+    background-color: #e36161; /* Hover effect for Confirm button */
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+  }
+    table {
+      width: 100%; /* Full width of the container */
+    }
+    th{
+      padding: 8px; /* Padding inside cells */
+      border: 0px solid #f16262; /* Border for each cell */
+      text-align: center; /* Center align text in cells */
+      font-size: 70px;
+    }
+    td{
+        font-size: 200px;
+        padding: 8px; /* Padding inside cells */
+      border: 0px solid #f16262; /* Border for each cell */
+      text-align: center; /* Center align text in cells */
+      font-size: 70px;
+      
+    } 
+    th {
+      font-size: 30px;
+      border-radius: 400px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif       
+    }
+    .confirmed-rolls {
+  position: absolute;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  top: 1%; /* Move it higher to allow more space */
+  right: 20px; /* Adjust position to align with spreadsheet */
+  width: 20%; /* Adjust the width */
+  max-height: 90vh; /* Increase the height limit to 90% of the viewport */
+  overflow-y: auto; /* Scroll if content exceeds height */
+  background-color: rgba(255, 255, 255,); /* Semi-transparent background */
+  border: 0px solid #61e368; /* Border around confirmed rolls */
+  border-radius: 10px; /* Rounded corners */
+  padding: 10px; /* Padding for the confirmed rolls section */
+}
+  </style>
+</head>
+<body>
+  <!-- GIF element -->
+  <img src="Comp 1_1.gif" alt="Animated GIF">
+
+  <!-- Button for rolling the dice -->
+  <button class="roll-button" id="rollButton">HOD</button>
+  
+  <!-- Button to reset confirmed rolls -->
+  <button class="reset-button" id="resetButton">RESET</button>
+
+  <!-- Spreadsheet for confirming rolled dice -->
+  <div class="spreadsheet" id="spreadsheet">
+    <table>
+      <thead>
+        <tr>
+          <th>Kostky</th>
+          <th>Zapsání</th>
+        </tr    >
+      </thead>
+      <tbody id="spreadsheetBody">
+        <!-- Rows will be dynamically added here -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Section to display confirmed rolls -->
+  <div class="confirmed-rolls" id="confirmedRolls">
+    <h3></h3>
+    <div id="confirmedRollsContainer">
+      <!-- Confirmed rolls will be displayed here -->
+    </div>
+  </div>
+
+  <!-- Include the p5.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script>
+    let a = "⚀⚁⚂⚃⚄⚅⚇⚈⚉"; // 9 symbols
+    let rolls = []; // To store the current session rolls
+    let confirmedRolls = []; // Array to store confirmed rolls
+    let rolling = false; // Flag to track rolling state
+    let finalRoll; // Store the final roll to be displayed
+  
+    function setup() {
+      // Create a canvas that matches the window size
+      createCanvas(windowWidth, windowHeight);
+      
+      // Add event listener to the roll button
+      document.getElementById("rollButton").addEventListener("click", rollDice);
+  
+      // Add event listener to the reset button
+      document.getElementById("resetButton").addEventListener("click", resetConfirmedRolls);
+    }
+  
+    function draw() {
+      setFrameRate(17);
+      background(0, 0, 0); // Change to blue background color
+      textSize(300); // Increase text size for a larger dice symbol
+      textAlign(CENTER, CENTER);
+  
+      // If rolling, display the rolling effect
+      if (rolling) {
+        fill(255, 195, 0); // Change text color to black while rolling
+        let currentRollIndex = Math.floor(frameCount / 5) % rolls.length; // Cycle through rolls based on frameCount
+        text(a[rolls[currentRollIndex]], width / 2, height / 2); // Display current roll
+      } else if (finalRoll !== undefined) {
+        fill(237, 247, 246); // Final roll color
+        text(a[finalRoll], width / 2, height / 2); // Display the last roll
+      }
+    }
+  
+    // Function to roll the dice
+    function rollDice() {
+      let rollCount = Math.floor(Math.random() * 6) + 5; // Generate a random roll count between 5 and 10
+      rolls = []; // Reset rolls for this session
+      
+      // Generate unique rolls
+      for (let j = 0; j < rollCount; j++) {
+        let newRoll;
+        do {
+          newRoll = myRandom() % 9; // Generate a random roll with 8 symbols
+        } while (confirmedRolls.includes(a[newRoll])); // Ensure it is not a confirmed roll
+        rolls.push(newRoll); // Add the unique roll to the rolls array
+      }
+  
+      rolling = true; // Set rolling state to true
+      finalRoll = undefined; // Reset final roll before rolling
+  
+      // Display the rolled values in the spreadsheet after the animation
+      setTimeout(() => {
+        // Remove any unconfirmed rolls from the spreadsheet
+        const spreadsheetBody = document.getElementById("spreadsheetBody");
+        const unconfirmedRollValue = a[rolls[rolls.length - 1]];
+        const rows = spreadsheetBody.getElementsByTagName("tr");
+        for (let row of rows) {
+          if (row.firstChild.textContent === unconfirmedRollValue) {
+            row.remove(); // Remove unconfirmed roll from the spreadsheet
+            break; // Exit the loop after removing
+          }
+        }
+  
+        finalRoll = rolls[rolls.length - 1]; // Get the last rolled value
+        addToSpreadsheet(a[finalRoll]); // Add it to the spreadsheet
+        rolling = false; // Stop rolling after the animation
+      }, 2000); // Duration for rolling animation
+    }
+  
+    // Update the rolls display to show the last roll
+    function addToSpreadsheet(rolledValue) {
+      const spreadsheetBody = document.getElementById("spreadsheetBody");
+      const newRow = document.createElement("tr");
+  
+      // Create cell for the rolled value
+      const valueCell = document.createElement("td");
+        valueCell.textContent = rolledValue;
+        valueCell.classList.add("rolled-dice-cell");  // Apply the new class
+        newRow.appendChild(valueCell);
+  
+      // Create cell for the confirm button
+      const confirmCell = document.createElement("td");
+      const confirmButton = document.createElement("button");
+      confirmButton.textContent = "ZAPSAT";
+      confirmButton.onclick = function() {
+        confirmRoll(rolledValue); // Confirm the roll
+        newRow.remove(); // Remove the row from the spreadsheet
+      };
+      confirmCell.appendChild(confirmButton);
+      newRow.appendChild(confirmCell);
+  
+      spreadsheetBody.appendChild(newRow); // Add the new row to the spreadsheet
+    }
+  
+    // Confirm the rolled value
+    function confirmRoll(rolledValue) {
+  confirmedRolls.push(rolledValue); // Add the confirmed roll to the array
+  const confirmedRollsContainer = document.getElementById("confirmedRollsContainer");
+  
+  // Append the confirmed roll symbol with the desired font size
+  confirmedRollsContainer.innerHTML += `<div class="confirmed-roll-symbol" style="font-size: 150px;">${rolledValue}</div>`; 
+}
+  
+    // Update the confirmed rolls display
+    function updateConfirmedRollsDisplay() {
+      const confirmedRollsContainer = document.getElementById("confirmedRollsContainer");
+      confirmedRollsContainer.innerHTML = ''; // Clear previous display
+  
+      confirmedRolls.forEach(roll => {
+        const rollDiv = document.createElement("div");
+        rollDiv.textContent = roll; // Display each confirmed roll
+        confirmedRollsContainer.appendChild(rollDiv);
+      });
+    }
+  
+    // Reset the confirmed rolls
+    function resetConfirmedRolls() {
+      confirmedRolls = []; // Clear the confirmed rolls array
+      document.getElementById("confirmedRollsContainer").innerHTML = ''; // Clear the displayed confirmed rolls
+      const spreadsheetBody = document.getElementById("spreadsheetBody");
+      spreadsheetBody.innerHTML = ''; // Clear the spreadsheet for rolls
+  
+      // Re-enable rolling by resetting the rolls array
+      rolls = []; // Ensure rolls are empty for new rolls
+    }
+  
+    // Custom random function to simulate random dice roll
+    function myRandom() {
+      let seed = Math.floor(Math.random() * 1000);
+      seed = (seed * seed).toString();
+      while (seed.length < 10) {
+        seed = '0' + seed;
+      }
+      seed = seed.substr(2, 6);
+      return parseInt(seed);
+    }
+  
+    // Adjust canvas size when the window is resized
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+    }
+  </script>
+  
+</body>
+</html>
